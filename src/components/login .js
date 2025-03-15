@@ -22,21 +22,42 @@ const Login = () => {
 
   const formHandler = async () => {
     try {
+      let data;
+
       if (isSignUp) {
-        const data = await signUpHandler(user);
+        // Trying the signup request
+        data = await signUpHandler(user);
+
+        if (!data) {
+          throw new Error('Signup failed! No response from the server.');
+        }
+
         console.log("Sign Up successful:", data);
         alert("Sign Up Successful! Please log in.");
         setIsSignUp(false);
       } else {
-        const data = await loginUserHandler({ email: user.email, password: user.password });
+        // Trying the login request
+        data = await loginUserHandler({ email: user.email, password: user.password });
+
+        if (!data) {
+          throw new Error('Login failed! No response from the server.');
+        }
+
         console.log("Login successful:", data);
-        localStorage.setItem("token", data.token);
+        localStorage.setItem("user", JSON.stringify(data));
         navigate("/instructions");
       }
     } catch (error) {
-      alert(error.response?.data?.message || "Something went wrong!");
+      console.error("Error occurred:", error);
+
+      // Handle specific error messages if available
+      const errorMessage = error.response?.data?.message || error.message || "Something went wrong!";
+
+      // Show alert with the error message
+      alert(errorMessage); // This will show the error or success message in a pop-up alert
     }
   };
+
 
   return (
     <div className={logincss.main}>
