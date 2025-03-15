@@ -13,14 +13,9 @@ const Login = () => {
       >
         <div className=" m-3 fw-bolder d-flex ">
           <h2 className="fw-bold" style={{ color: "violet" }}>
-            O
+           QUIZ
           </h2>
-          <h2 className="fw-bold" style={{ color: "gold" }}>
-            M
-          </h2>
-          <h2 className="fw-bold" style={{ color: "violet" }}>
-            R
-          </h2>
+         
           <p
             className="fw-bold ms-3 border-bottom border-success border-2"
             style={{ color: "violet" }}
