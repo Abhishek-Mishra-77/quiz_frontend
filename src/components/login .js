@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import logincss from "./login.module.css";
 import loginCartoon from "../components/images/wv52_pkc1_210811.jpg";
-import { loginUserHandler, signUpHandler } from "../api/authApi";
+import axios from 'axios';
 
 const Login = () => {
   const [user, setUser] = useState({
@@ -20,43 +20,33 @@ const Login = () => {
     setUser((prevUser) => ({ ...prevUser, [name]: value }));
   };
 
-  const formHandler = async () => {
+  const loginUserHandler = async () => {
+
     try {
-      let data;
-
-      if (isSignUp) {
-        // Trying the signup request
-        data = await signUpHandler(user);
-
-        if (!data) {
-          throw new Error('Signup failed! No response from the server.');
-        }
-
-        console.log("Sign Up successful:", data);
-        alert("Sign Up Successful! Please log in.");
-        setIsSignUp(false);
-      } else {
-        // Trying the login request
-        data = await loginUserHandler({ email: user.email, password: user.password });
-
-        if (!data) {
-          throw new Error('Login failed! No response from the server.');
-        }
-
-        console.log("Login successful:", data);
-        localStorage.setItem("user", JSON.stringify(data));
-        navigate("/instructions");
+      if (!isSignUp) {
+        const response = await axios.post(`${process.env.REACT_APP_API_URL}/users/login`, user);
+        localStorage.setItem('user', JSON.stringify(response.data.user));
+        navigate('/dashboard')
+      }
+      else {
+        const response = await axios.post(`${process.env.REACT_APP_API_URL}/users/create`, user);
+        localStorage.setItem('user', JSON.stringify(response.data.user));
+        navigate('/dashboard')
       }
     } catch (error) {
-      console.error("Error occurred:", error);
-
-      // Handle specific error messages if available
-      const errorMessage = error.response?.data?.message || error.message || "Something went wrong!";
-
-      // Show alert with the error message
-      alert(errorMessage); // This will show the error or success message in a pop-up alert
+      console.error("Error logging in:", error.response?.data?.message || error.message);
+      return { error: error.response?.data?.message || "Failed to login" };
+    }
+    finally {
+      setUser({
+        name: "",
+        email: "",
+        password: "",
+        role: "learner",
+      })
     }
   };
+
 
 
   return (
@@ -114,7 +104,7 @@ const Login = () => {
             )}
 
             <div className={logincss.loginBtn}>
-              <div onClick={formHandler}>{isSignUp ? "Sign Up" : "Login Now"}</div>
+              <div onClick={loginUserHandler}>{isSignUp ? "Sign Up" : "Login Now"}</div>
             </div>
 
             <div className="mt-3">
