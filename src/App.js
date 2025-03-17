@@ -4,6 +4,7 @@ import Instructions from "./components/instructions";
 import Login from "./components/login ";
 import TestScreen from "./components/testScreen";
 import Dashboard from "./components/Dashboard";
+import LearnerReport from "./components/LearnerReport";
 import FinalSubmit from "./components/FinalSubmit";
 
 function App() {
@@ -24,6 +25,21 @@ function App() {
             </>
           }
         ></Route>
+
+        <Route
+          path="/report"
+          element={
+            <>
+              <div className="container-fluid bg-blue-500">
+                <div className="text-white text-center p-2 fw-bold">
+                  <h2>Report</h2>
+                </div>
+              </div>
+              <LearnerReport />
+            </>
+          }
+        ></Route>
+
 
         {/* Instructions Route */}
         <Route
