@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 
 const LearnerReport = () => {
   const userRole = JSON.parse(localStorage.getItem("user"));
@@ -10,6 +11,19 @@ const LearnerReport = () => {
     skipped: 1,
     unattempted: 5,
   });
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const response = await axios.get(
+          `${process.env.REACT_APP_API_URL}/assessments/get`
+        );
+console.log(response)
+      } catch (error) {
+        console.log(error);
+      }
+    })();
+  }, []);
 
   const totalQuestions = report.submitted + report.skipped + report.unattempted;
   const score = ((report.submitted / totalQuestions) * 100).toFixed(1);

@@ -9,11 +9,15 @@ import { FaClipboardQuestion } from "react-icons/fa6";
 import { IoCheckmarkDoneCircleSharp } from "react-icons/io5";
 import QuestionSelector from "./questionSelector";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
+
 
 const TestScreen = () => {
   const [nextVisible, setNextVisible] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const user = JSON.parse(localStorage.getItem('user'));
+
   const questions = useSelector((state) => {
     return state.current;
   });
@@ -61,8 +65,47 @@ const TestScreen = () => {
     setNextVisible(false);
   };
 
-  const onFinalSubmitHandler = () => {
-    navigate("/finalsubmit");
+
+  const onFinalSubmitHandler = async () => {
+    let attempted = 0;
+    let unattempted = 0;
+    let correct = 0;
+
+    console.log(allQuestions);
+
+    allQuestions.forEach((q) => {
+      const userAnswer = answerSheet.find((a) => a.queno === q.no);
+      console.log(userAnswer);
+
+      if (userAnswer) {
+        attempted++;
+        console.log(userAnswer.selectedOption, q.correctAnswer);
+
+        // Compare the selected answer with the correct one
+        if (userAnswer.selectedOption === q.correctAnswer) {
+          correct++;
+        }
+      } else {
+        unattempted++;
+      }
+    });
+    // Send data to backend for assessment creation
+    try {
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/assessments/create`, {
+        userId: user.id,
+        total_questions: allQuestions.length,
+        attempted: attempted,
+        unattempted: allQuestions.length - attempted,
+        correct: correct,
+        published: false,
+      });
+
+      console.log("Assessment saved:", response.data);
+      // navigate to final submit page
+      navigate("/finalsubmit");
+    } catch (error) {
+      console.error("Error saving assessment:", error);
+    }
   };
 
   return (
@@ -185,7 +228,7 @@ const TestScreen = () => {
             </div>
           </div>
         </div>
-          <QuestionSelector />
+        <QuestionSelector />
       </div>
     </div>
   );
